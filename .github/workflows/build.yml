@@ -6,6 +6,14 @@ on:
   pull_request:
     branches: [main]
 
+# Opt all JavaScript-based actions into Node.js 24. GitHub deprecated Node 20 actions in
+# Sept 2025; Node 20 is removed from runners on 2026-09-16. Setting this env now means
+# we run on the supported runtime today without waiting for each action's v5 release.
+# Drop this when actions/checkout, actions/setup-java, actions/upload-artifact, and
+# gradle/actions/setup-gradle all default to Node 24 (Dependabot will PR the bumps).
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   gradle-wrapper:
     name: Gradle wrapper validation
