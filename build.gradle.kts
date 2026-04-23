@@ -12,10 +12,15 @@ plugins {
 apiValidation {
     // Only track the library's API surface. Skip the samples (consumers, not published) and the
     // lint module (internal to the library; its public API is just Issue objects consumed
-    // reflectively by lint itself). `shared` is the iOS sample's KMP sub-module; it's only
-    // included on macOS hosts (see settings.gradle.kts) but we unconditionally list it — the
-    // validator tolerates names that don't resolve to a project on the current host.
-    ignoredProjects += listOf("sample-android", "vmscope-lint", "shared", "android-app")
+    // reflectively by lint itself).
+    ignoredProjects += listOf("sample-android", "vmscope-lint")
+    // The KMP sample's `:sample-kmp:shared` and `:sample-kmp:android-app` are gated to macOS
+    // hosts in settings.gradle.kts (iOS targets need Xcode tooling). Add their names to the
+    // ignore list only when they're actually included — the validator throws on names that
+    // don't resolve to a real project, contrary to what we initially assumed.
+    if (System.getProperty("os.name").lowercase().contains("mac")) {
+        ignoredProjects += listOf("shared", "android-app")
+    }
     // Also validate the per-target KMP publications, not just the JVM one.
     @OptIn(kotlinx.validation.ExperimentalBCVApi::class)
     klib {
