@@ -1,11 +1,9 @@
 package org.velkos.vmscope.internal
 
-/**
- * Platform primitives for the vmScope handler decision tree. Kept deliberately tiny: the decision
- * logic (what to do with an uncaught throwable given the current config and debug mode) lives in
- * [org.velkos.vmscope.VmScope] in commonMain; platforms only supply the three
- * primitives below.
- */
+// Platform primitives for the vmScope handler decision tree. Kept deliberately tiny: the
+// decision logic (what to do with an uncaught throwable given the current config and debug
+// mode) lives in org.velkos.vmscope.VmScope in commonMain; platforms only supply the three
+// primitives below.
 
 /** `true` when running under a debuggable build of the host app; `false` otherwise. */
 internal expect fun platformIsDebuggable(): Boolean

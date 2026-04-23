@@ -7,23 +7,21 @@ import platform.posix.abort
 import kotlin.experimental.ExperimentalNativeApi
 import kotlin.native.Platform
 
-/**
- * iOS (arm64, x64 sim, simulator-arm64) actuals.
- *
- * Debuggable detection uses [Platform.isDebugBinary], which reflects the build configuration the
- * Kotlin/Native framework was compiled with. [platformCrash] prints the throwable and calls the
- * POSIX `abort()` to produce SIGABRT — caught by Xcode's debugger, captured in iOS crash reports,
- * and surfaced to any attached crash reporter (Crashlytics / Sentry / Bugsnag) that hooks Mach
- * exceptions.
- *
- * Why `abort()` rather than a re-throw? [platformCrash] is invoked from inside a
- * [kotlinx.coroutines.CoroutineExceptionHandler]. A throw from there gets caught by coroutines'
- * `handlerException` which wraps it as "Exception while trying to handle coroutine exception"
- * and forwards to `propagateExceptionFinalResort`, which schedules the exception on
- * `Dispatchers.Main` rather than terminating. Net effect: the app keeps running, SwiftUI's
- * runloop re-enters the exception path on every subsequent gesture, and the debugger stops at
- * the same breakpoint repeatedly. `abort()` terminates synchronously, as intended.
- */
+// iOS (arm64, x64 sim, simulator-arm64) actuals.
+//
+// Debuggable detection uses Platform.isDebugBinary, which reflects the build configuration the
+// Kotlin/Native framework was compiled with. platformCrash prints the throwable and calls the
+// POSIX abort() to produce SIGABRT — caught by Xcode's debugger, captured in iOS crash
+// reports, and surfaced to any attached crash reporter (Crashlytics / Sentry / Bugsnag) that
+// hooks Mach exceptions.
+//
+// Why abort() rather than a re-throw? platformCrash is invoked from inside a
+// kotlinx.coroutines.CoroutineExceptionHandler. A throw from there gets caught by coroutines'
+// handlerException which wraps it as "Exception while trying to handle coroutine exception"
+// and forwards to propagateExceptionFinalResort, which schedules the exception on
+// Dispatchers.Main rather than terminating. Net effect: the app keeps running, SwiftUI's
+// runloop re-enters the exception path on every subsequent gesture, and the debugger stops at
+// the same breakpoint repeatedly. abort() terminates synchronously, as intended.
 
 @OptIn(ExperimentalNativeApi::class)
 internal actual fun platformIsDebuggable(): Boolean = Platform.isDebugBinary

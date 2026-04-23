@@ -11,6 +11,13 @@ plugins {
 kotlin {
     explicitApi()
 
+    // Acknowledge the Beta status of `expect`/`actual` classes (internal/Synchronization.kt's
+    // `SynchronizedLock`). API is stable for our use; compiler just wants explicit opt-in.
+    // Tracked by KT-61573 — drop this flag once that issue is resolved.
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     androidTarget {
         publishLibraryVariants("release")
         compilerOptions {
