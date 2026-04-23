@@ -63,6 +63,24 @@ class UserViewModel : ViewModel() {
 
 The `UseVmScope` lint rule offers an Android Studio quick fix to replace `viewModelScope` references and add the import.
 
+## Migrating an existing codebase
+
+Primarily relevant if you're adding vmscope to an existing Android codebase that uses `viewModelScope` — greenfield projects can skip ahead to **Configure (Android)** below. iOS-only / JVM-only consumers won't have lint to deal with.
+
+### With an AI coding agent (recommended for any non-trivial codebase)
+
+An agent-assisted migration guide ships at [`migration/AGENT_MIGRATION.md`](migration/AGENT_MIGRATION.md). Point your coding agent of choice (Claude Code, Codex, Cursor, Aider) at the file — the agent walks through a seven-phase migration in the correct order with safety checks for judgment-heavy steps (broad `catch (Throwable)` blocks, `CancellationException` handling, missing `Application` class, Hilt interaction). Supports both Android-only and Kotlin Multiplatform projects. Review the diff carefully before merging — migrations touch exception-handling code paths and can surface latent bugs.
+
+### Manual migration (without an agent)
+
+The four lint rules are designed to be turned on without a flag day. In a large codebase with many `viewModelScope` call-sites:
+
+```bash
+./gradlew updateLintBaseline
+```
+
+Commit `lint-baseline.xml`, migrate incrementally (the `UseVmScope` quick fix handles most cases), and tighten severities in `lint.xml` once clean. **Do not baseline `MissingVmScopeConfigProvider`** — it's the one rule that needs to be addressed immediately before shipping.
+
 ## Configure (Android)
 
 Required on Android. Implement `VmScopeConfig.Provider` on your `Application`:
@@ -80,24 +98,6 @@ class MyApp : Application(), VmScopeConfig.Provider {
 vmScope auto-discovers your provider at process start via Jetpack App Startup. You do not need to register it, call `VmScope.install(…)`, or wire anything into `onCreate`.
 
 The `MissingVmScopeConfigProvider` lint rule fires at **Fatal** severity if your module declares an `Application` subclass that does not implement the provider — release builds will not ship without explicit action.
-
-## Migrating an existing codebase
-
-Primarily relevant if you're adding vmscope to an existing Android codebase that uses `viewModelScope` — greenfield projects can skip ahead. iOS-only / JVM-only consumers won't have lint to deal with.
-
-### With an AI coding agent (recommended for any non-trivial codebase)
-
-An agent-assisted migration guide ships at [`migration/AGENT_MIGRATION.md`](migration/AGENT_MIGRATION.md). Point your coding agent of choice (Claude Code, Codex, Cursor, Aider) at the file — the agent walks through a seven-phase migration in the correct order with safety checks for judgment-heavy steps (broad `catch (Throwable)` blocks, `CancellationException` handling, missing `Application` class, Hilt interaction). Supports both Android-only and Kotlin Multiplatform projects. Review the diff carefully before merging — migrations touch exception-handling code paths and can surface latent bugs.
-
-### Manual migration (without an agent)
-
-The four lint rules are designed to be turned on without a flag day. In a large codebase with many `viewModelScope` call-sites:
-
-```bash
-./gradlew updateLintBaseline
-```
-
-Commit `lint-baseline.xml`, migrate incrementally (the `UseVmScope` quick fix handles most cases), and tighten severities in `lint.xml` once clean. **Do not baseline `MissingVmScopeConfigProvider`** — it's the one rule that needs to be addressed immediately before shipping.
 
 ## Configure (iOS)
 
