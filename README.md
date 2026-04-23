@@ -179,6 +179,10 @@ The four rules are designed to be turned on without a flag day. In a large codeb
 
 Commit `lint-baseline.xml`, migrate incrementally (the `UseVmScope` quick fix handles most cases), and tighten severities in `lint.xml` once clean. **Do not baseline `MissingVmScopeConfigProvider`** — it's the one rule that needs to be addressed immediately before shipping.
 
+### Migrating with an AI coding agent
+
+For larger codebases, an agent-assisted migration guide is available at [`migration/AGENT_MIGRATION.md`](migration/AGENT_MIGRATION.md). Point your coding agent of choice (Claude Code, Codex, Cursor, Aider) at the file — the agent walks through a seven-phase migration in the correct order with safety checks for judgment-heavy steps. Supports both Android-only and Kotlin Multiplatform projects. Review the diff carefully before merging.
+
 ## Advanced — opt out of auto-init
 
 If your app uses a non-standard `Application` class (from a cross-platform framework, a game engine, or similar) and implementing `VmScopeConfig.Provider` is awkward, you can disable auto-init and install manually. Remove the initializer in your `AndroidManifest.xml`:
@@ -232,9 +236,7 @@ class MyApp : Application(), VmScopeConfig.Provider {
 
 The library's App Startup initializer runs before `Application.onCreate` (before Hilt's injection completes), and reads the provider via `context.applicationContext as? VmScopeConfig.Provider` — this cast works regardless of Hilt's injection state because the interface is defined on the class, not injected into it.
 
-**What's the runtime overhead?** Negligible. The release AAR is ~45 KB (`classes.jar` 18 KB + `lint.jar` 30 KB; the lint jar is build-time only and doesn't ship with consumer code). Across 15 classes, ~42 declared methods (true post-R8 DEX method count not measured — would need `dexcount-gradle-plugin` for an exact figure).
-
-At `vmScope` creation (once per ViewModel instance), the library allocates one `SupervisorJob`, one `CloseableCoroutineScope`, and wires in the configured `CoroutineExceptionHandler`. At launch time, there is no additional allocation beyond what `viewModelScope.launch` already does — the handler is already in the context. The App Startup initializer at process start does one app-context capture + one `as?` cast + one atomic write — sub-millisecond cost on any Android device made in the last decade (true measurement on a specific device not yet taken). There is no reflection on the hot path.
+**What's the runtime overhead?** Small. The runtime AAR is 18 KB. vmScope's allocation shape matches `viewModelScope`'s — one `SupervisorJob` + one scope per ViewModel at first access, nothing new at `launch` time. App Startup does a context capture and one interface cast at process start. No reflection anywhere.
 
 ## License
 
