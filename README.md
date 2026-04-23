@@ -14,11 +14,11 @@ A Kotlin Multiplatform drop-in replacement for `viewModelScope` with a configura
 | iOS arm64 / x64 sim / simulator-arm64 | supported | manual `VmScope.install(config)` |
 | JVM (desktop / server) | supported | manual `VmScope.install(config)` |
 
-Lint rules are Android-only — they run against JVM bytecode and ship inside the Android AAR. iOS and non-Android JVM consumers get no lint coverage; detekt is a reasonable parallel for those.
+Lint rules are Android-only — they run against JVM bytecode and ship inside the Android AAR. iOS and non-Android JVM consumers get no lint coverage.
 
 ## What and why
 
-`androidx.lifecycle.viewModelScope` has no installed exception handler. Any exception thrown in a coroutine launched on it that isn't caught by the application code propagates to the JVM's default uncaught-exception handler — in practice, it crashes the process. On release builds this lands in your crash reporter as a `RuntimeException` with no particular signal, mixed in with everything else; in tests it's easy to not notice at all.
+`androidx.lifecycle.viewModelScope` has no installed exception handler. Any exception thrown in a coroutine launched on it that isn't caught by the application code propagates to the JVM's default uncaught-exception handler — in practice, it crashes the process. In tests it's easy to not notice at all; in production you get a crash report with no hook for your own handling logic (no "wrap it, route it, decide per build type").
 
 ```kotlin
 // viewModelScope: uncaught exceptions propagate unhelpfully.
@@ -81,6 +81,24 @@ vmScope auto-discovers your provider at process start via Jetpack App Startup. Y
 
 The `MissingVmScopeConfigProvider` lint rule fires at **Fatal** severity if your module declares an `Application` subclass that does not implement the provider — release builds will not ship without explicit action.
 
+## Migrating an existing codebase
+
+Primarily relevant if you're adding vmscope to an existing Android codebase that uses `viewModelScope` — greenfield projects can skip ahead. iOS-only / JVM-only consumers won't have lint to deal with.
+
+### With an AI coding agent (recommended for any non-trivial codebase)
+
+An agent-assisted migration guide ships at [`migration/AGENT_MIGRATION.md`](migration/AGENT_MIGRATION.md). Point your coding agent of choice (Claude Code, Codex, Cursor, Aider) at the file — the agent walks through a seven-phase migration in the correct order with safety checks for judgment-heavy steps (broad `catch (Throwable)` blocks, `CancellationException` handling, missing `Application` class, Hilt interaction). Supports both Android-only and Kotlin Multiplatform projects. Review the diff carefully before merging — migrations touch exception-handling code paths and can surface latent bugs.
+
+### Manual migration (without an agent)
+
+The four lint rules are designed to be turned on without a flag day. In a large codebase with many `viewModelScope` call-sites:
+
+```bash
+./gradlew updateLintBaseline
+```
+
+Commit `lint-baseline.xml`, migrate incrementally (the `UseVmScope` quick fix handles most cases), and tighten severities in `lint.xml` once clean. **Do not baseline `MissingVmScopeConfigProvider`** — it's the one rule that needs to be addressed immediately before shipping.
+
 ## Configure (iOS)
 
 No Application class, no auto-init. Call `VmScope.install(config)` once during app bootstrap. A common pattern is a shared-Kotlin `initVmScope()` function that Swift calls at app launch:
@@ -90,10 +108,9 @@ No Application class, no auto-init. Call `VmScope.install(config)` once during a
 fun initVmScope() {
     VmScope.install {
         onUnhandledException { e ->
-            // Route to your iOS crash reporter. Crashlytics / Sentry / Bugsnag all expose
-            // per-target native SDKs you can call into from Kotlin/Native, or you can log
-            // to NSLog and pick up in your server-side ingestion.
-            NSLog("%@", "vmScope uncaught: $e")
+            // Route to your iOS crash reporter — Crashlytics / Sentry / Bugsnag all expose
+            // per-target native SDKs callable from Kotlin/Native.
+            println("vmScope uncaught: $e")
         }
     }
 }
@@ -106,21 +123,17 @@ import YourSharedKMP
 @main
 struct MyApp: App {
     init() {
-        // Kotlin/Native rewrites top-level functions whose name starts with `init` to
-        // `do<Original>` in the Swift interface (avoids colliding with Swift's `init`
-        // constructor keyword). If your Kotlin file is `VmScopeBootstrap.kt` the synthetic
-        // Swift class is `VmScopeBootstrapKt` and the Swift-visible name is `doInitVmScope`.
         VmScopeBootstrapKt.doInitVmScope()
     }
     var body: some Scene { … }
 }
 ```
 
+Swift-visible name note: Kotlin/Native rewrites any top-level function whose name starts with `init` to `do<Original>` in the generated Swift interface, to avoid colliding with Swift's `init` constructor keyword. Your Kotlin `initVmScope()` is therefore called as `doInitVmScope()` from Swift. The rewrite cannot be suppressed on top-level functions.
+
+NSLog-from-Kotlin/Native caveat: the NSLog varargs bridge segfaults reproducibly on Kotlin/Native 2.3.x when passed Kotlin strings — vmscope itself uses `println` internally for this reason. If you need output visible in Xcode's console, `println` routes through stderr to the same place. If you need an iOS crash report signal, call into your crash reporter's native SDK directly; don't rely on NSLog.
+
 `VmScopeConfig.Provider` still exists on iOS as a declared interface, but implementing it has no discovery effect — only the manual `install(...)` call takes effect.
-
-A full KMP reference consumer lives in [`sample-kmp/`](sample-kmp/) — one `SharedSampleViewModel` in `commonMain` consumed by both an Android app (`:sample-kmp:android-app`) and a SwiftUI iOS app (`sample-kmp/ios-app/`). Demonstrates the auto-init path on Android (`VmScopeConfig.Provider` on `Application`) alongside the manual `initVmScope()` path on iOS, and contrasts `vmScope.launch { throw }` with raw `viewModelScope.launch { throw }` so you can see the platform-default failure modes vmScope is replacing. Build + run instructions in [`sample-kmp/README.md`](sample-kmp/README.md). iOS side is simulator-only; the whole directory is macOS-gated in `settings.gradle.kts`.
-
-For the pure Android-only integration (no KMP plugin, no shared code — the shape a typical Android-only consumer would write), see [`sample-android/`](sample-android/) instead.
 
 ## Configure (JVM desktop / server)
 
@@ -169,20 +182,6 @@ Consumer ViewModel tests work unchanged. No test rule, no test dependency, no se
 - **Debug** (`ApplicationInfo.FLAG_DEBUGGABLE` is set): uncaught exceptions always crash the process via `Thread.getDefaultUncaughtExceptionHandler()`. Your `onUnhandledException` callback is ignored so bugs stay visible during development.
 - **Release**: your `onUnhandledException` callback is invoked with `UnhandledViewModelException` wrapping the original throwable. If you set a custom `handler(CoroutineExceptionHandler)` instead, it takes over entirely and receives the original throwable unwrapped.
 
-## Migrating an existing codebase
-
-The four rules are designed to be turned on without a flag day. In a large codebase with many `viewModelScope` call-sites:
-
-```bash
-./gradlew updateLintBaseline
-```
-
-Commit `lint-baseline.xml`, migrate incrementally (the `UseVmScope` quick fix handles most cases), and tighten severities in `lint.xml` once clean. **Do not baseline `MissingVmScopeConfigProvider`** — it's the one rule that needs to be addressed immediately before shipping.
-
-### Migrating with an AI coding agent
-
-For larger codebases, an agent-assisted migration guide is available at [`migration/AGENT_MIGRATION.md`](migration/AGENT_MIGRATION.md). Point your coding agent of choice (Claude Code, Codex, Cursor, Aider) at the file — the agent walks through a seven-phase migration in the correct order with safety checks for judgment-heavy steps. Supports both Android-only and Kotlin Multiplatform projects. Review the diff carefully before merging.
-
 ## Advanced — opt out of auto-init
 
 If your app uses a non-standard `Application` class (from a cross-platform framework, a game engine, or similar) and implementing `VmScopeConfig.Provider` is awkward, you can disable auto-init and install manually. Remove the initializer in your `AndroidManifest.xml`:
@@ -212,6 +211,13 @@ override fun onCreate() {
 Suppress the lint check on your Application class with `@Suppress("MissingVmScopeConfigProvider")`.
 
 This mirrors the opt-out pattern used by `WorkManager.initialize` — see [WorkManager's custom-configuration documentation](https://developer.android.com/topic/libraries/architecture/workmanager/advanced/custom-configuration) for conceptual precedent.
+
+## Samples
+
+Two reference consumers live in the repo, each demonstrating a distinct integration path:
+
+- [`sample-android/`](sample-android/) — pure Android (no KMP plugin, no shared code). The shape a typical Android-only consumer would write: `VmScopeConfig.Provider` on `Application`, App Startup auto-init, `vmScope.launch` in ViewModels. Builds under R8.
+- [`sample-kmp/`](sample-kmp/) — full KMP. One `SharedSampleViewModel` in `commonMain` consumed by both an Android app (`:sample-kmp:android-app`) and a SwiftUI iOS app (`sample-kmp/ios-app/`). Demonstrates the auto-init path on Android alongside the manual `initVmScope()` path on iOS, and contrasts `vmScope.launch { throw }` with raw `viewModelScope.launch { throw }` to surface the platform-default failure modes vmScope is replacing. Simulator-only; the whole directory is macOS-gated in `settings.gradle.kts`. Build + run details in [`sample-kmp/README.md`](sample-kmp/README.md).
 
 ## FAQ
 
