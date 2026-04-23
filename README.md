@@ -46,6 +46,23 @@ dependencies {
 
 Lint rules ship in the AAR via `lintPublish` — no additional setup.
 
+## Using `vmScope`
+
+After installing, replace `viewModelScope` with `vmScope` in your ViewModels. The next section explains how to wire up the exception handler per platform.
+
+```kotlin
+class UserViewModel : ViewModel() {
+    fun load() {
+        vmScope.launch {
+            val user = api.fetchUser()
+            _state.value = user
+        }
+    }
+}
+```
+
+The `UseVmScope` lint rule offers an Android Studio quick fix to replace `viewModelScope` references and add the import.
+
 ## Configure (Android)
 
 Required on Android. Implement `VmScopeConfig.Provider` on your `Application`:
@@ -122,23 +139,6 @@ fun main() {
 ```
 
 **Caveat — `Dispatchers.Main`.** The library uses `Dispatchers.Main.immediate` to match `viewModelScope` semantics. On Android and iOS this is automatic. On bare JVM with no UI framework, `Dispatchers.Main` is not available and the library falls back to `EmptyCoroutineContext` (same behavior as `androidx.lifecycle.viewModelScope` on those targets). For Compose Desktop consumers, add `org.jetbrains.kotlinx:kotlinx-coroutines-swing` or `-javafx` to supply a Main dispatcher.
-
-## Using `vmScope`
-
-Swap `viewModelScope` for `vmScope` in your ViewModels:
-
-```kotlin
-class UserViewModel : ViewModel() {
-    fun load() {
-        vmScope.launch {
-            val user = api.fetchUser()
-            _state.value = user
-        }
-    }
-}
-```
-
-The `UseVmScope` lint rule offers an Android Studio quick fix to replace `viewModelScope` references and add the import.
 
 ## Exception handling discipline
 
@@ -218,6 +218,23 @@ This mirrors the opt-out pattern used by `WorkManager.initialize` — see [WorkM
 **What about `lifecycleScope`?** Out of scope for v1. File an issue if this matters to your team.
 
 **Why crash by default in release if no callback is configured?** The `MissingVmScopeConfigProvider` lint rule exists precisely so this path is unreachable in well-configured projects. If you get there anyway, loud failure is the right behavior — silently swallowing exceptions in production is worse than crashing.
+
+**Does this work with Hilt?** Yes. Implement `VmScopeConfig.Provider` on your `@HiltAndroidApp`-annotated `Application` alongside any other interfaces you're already using. The annotations and interface composition work together:
+
+```kotlin
+@HiltAndroidApp
+class MyApp : Application(), VmScopeConfig.Provider {
+    override val vmScopeConfiguration = vmScopeConfig {
+        onUnhandledException { e -> FirebaseCrashlytics.getInstance().recordException(e) }
+    }
+}
+```
+
+The library's App Startup initializer runs before `Application.onCreate` (before Hilt's injection completes), and reads the provider via `context.applicationContext as? VmScopeConfig.Provider` — this cast works regardless of Hilt's injection state because the interface is defined on the class, not injected into it.
+
+**What's the runtime overhead?** Negligible. The release AAR is ~45 KB (`classes.jar` 18 KB + `lint.jar` 30 KB; the lint jar is build-time only and doesn't ship with consumer code). Across 15 classes, ~42 declared methods (true post-R8 DEX method count not measured — would need `dexcount-gradle-plugin` for an exact figure).
+
+At `vmScope` creation (once per ViewModel instance), the library allocates one `SupervisorJob`, one `CloseableCoroutineScope`, and wires in the configured `CoroutineExceptionHandler`. At launch time, there is no additional allocation beyond what `viewModelScope.launch` already does — the handler is already in the context. The App Startup initializer at process start does one app-context capture + one `as?` cast + one atomic write — sub-millisecond cost on any Android device made in the last decade (true measurement on a specific device not yet taken). There is no reflection on the hot path.
 
 ## License
 

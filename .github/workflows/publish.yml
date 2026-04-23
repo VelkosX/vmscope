@@ -4,6 +4,18 @@ on:
   push:
     tags:
       - 'v*'
+  # Manual dispatch for RC / pre-release testing. Lets you stage a test artifact to Sonatype
+  # Central without having to push a real tag first. The `version` input is required and flows
+  # through to Gradle as `-PVERSION_NAME=<value>`. Use pre-release suffixes (e.g. `0.1.0-rc1`)
+  # so a real `0.1.0` release isn't pre-empted. The pipeline still only publishes to the
+  # Sonatype staging bundle (`publishToMavenCentral`, not `publishAndReleaseToMavenCentral`),
+  # so nothing lands on Central until you manually release (or drop) from the Portal UI.
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to stage (no leading 'v', e.g. 0.1.0-rc1)"
+        required: true
+        type: string
 
 # See build.yml for rationale. Drop when v5 of each action is in use.
 env:
@@ -28,8 +40,15 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Derive version from tag
-        run: echo "VERSION_NAME=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+      - name: Derive version
+        # Tag push → strip the leading 'v' off the ref name (e.g. `v0.1.0` → `0.1.0`).
+        # Manual dispatch → trust the `version` input verbatim (operator-supplied, e.g. `0.1.0-rc1`).
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION_NAME=${{ inputs.version }}" >> "$GITHUB_ENV"
+          else
+            echo "VERSION_NAME=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          fi
 
       - name: Verify tests pass before publish
         run: |
