@@ -1,6 +1,6 @@
 # vmScope
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.velkos/vmscope-core.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/org.velkos/vmscope-core)
+[![Maven Central](https://img.shields.io/maven-central/v/org.velkos/vmscope.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/org.velkos/vmscope)
 [![Build](https://github.com/VelkosX/vmscope/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/VelkosX/vmscope/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -40,7 +40,7 @@ vmScope.launch {
 
 ```kotlin
 dependencies {
-    implementation("org.velkos:vmscope-core:0.1.0")
+    implementation("org.velkos:vmscope:0.1.0")
 }
 ```
 

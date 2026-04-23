@@ -1,4 +1,4 @@
-# Consumer R8/ProGuard rules for vmscope-core.
+# Consumer R8/ProGuard rules for vmscope.
 # Merged into the consumer app's R8 config automatically via the AAR.
 
 # 1. The App Startup initializer is referenced by fully-qualified name from the manifest.

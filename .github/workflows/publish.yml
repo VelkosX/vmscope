@@ -53,9 +53,9 @@ jobs:
       - name: Verify tests pass before publish
         run: |
           ./gradlew \
-            :vmscope-core:testDebugUnitTest \
-            :vmscope-core:jvmTest \
-            :vmscope-core:iosSimulatorArm64Test \
+            :vmscope:testDebugUnitTest \
+            :vmscope:jvmTest \
+            :vmscope:iosSimulatorArm64Test \
             :vmscope-lint:test \
             --stacktrace
 

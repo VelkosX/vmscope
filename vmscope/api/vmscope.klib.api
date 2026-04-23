@@ -5,7 +5,7 @@
 // - Show manifest properties: true
 // - Show declarations: true
 
-// Library unique name: <vmscope:vmscope-core>
+// Library unique name: <vmscope:vmscope>
 final class org.velkos.vmscope/UnhandledViewModelException : kotlin/RuntimeException { // org.velkos.vmscope/UnhandledViewModelException|null[0]
     constructor <init>(kotlin/Throwable) // org.velkos.vmscope/UnhandledViewModelException.<init>|<init>(kotlin.Throwable){}[0]
 }

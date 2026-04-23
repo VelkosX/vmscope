@@ -51,7 +51,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":vmscope-core"))
+    implementation(project(":vmscope"))
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.appcompat)

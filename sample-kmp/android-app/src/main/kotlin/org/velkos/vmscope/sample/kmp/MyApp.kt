@@ -10,7 +10,7 @@ import org.velkos.vmscope.sample.SampleLog
 import org.velkos.vmscope.vmScopeConfig
 
 /**
- * Android-side bootstrap for the KMP sample. Implements `VmScopeConfig.Provider` so vmscope-core's
+ * Android-side bootstrap for the KMP sample. Implements `VmScopeConfig.Provider` so vmscope's
  * App Startup initializer auto-discovers the configuration at process launch — no manual
  * `VmScope.install(...)` call is needed. This is the exact integration pattern an Android
  * consumer of a KMP app would use in production.

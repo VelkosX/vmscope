@@ -1,6 +1,6 @@
 # sample-kmp
 
-Full KMP reference consumer for `vmscope-core`. One shared ViewModel in `commonMain`, two app-side consumers — an Android app (`:sample-kmp:android-app`) and a SwiftUI iOS app (`sample-kmp/ios-app/`) — demonstrating the same library API driving both platforms from a single Kotlin codebase.
+Full KMP reference consumer for `vmscope`. One shared ViewModel in `commonMain`, two app-side consumers — an Android app (`:sample-kmp:android-app`) and a SwiftUI iOS app (`sample-kmp/ios-app/`) — demonstrating the same library API driving both platforms from a single Kotlin codebase.
 
 For the pure Android-only integration story (no KMP plugin, no shared code), see [`sample-android/`](../sample-android) instead. This directory is for KMP consumers.
 
@@ -8,7 +8,7 @@ For the pure Android-only integration story (no KMP plugin, no shared code), see
 
 1. A single `SharedSampleViewModel` in `commonMain` consumed by both Android and iOS.
 2. Platform-appropriate bootstrap on each side:
-   - **Android:** `VmScopeConfig.Provider` on `MyApp : Application` — auto-discovered by vmscope-core's App Startup initializer, zero manual wiring.
+   - **Android:** `VmScopeConfig.Provider` on `MyApp : Application` — auto-discovered by vmscope's App Startup initializer, zero manual wiring.
    - **iOS:** `initVmScope()` in `iosMain/SampleBootstrap.kt` called from Swift `@main App.init()`. No App Startup equivalent on iOS.
 3. Same four buttons on both apps driven by the shared ViewModel:
    - **Successful launch** — `vmScope.launch { delay(500); ... }`.

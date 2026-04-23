@@ -53,8 +53,8 @@ Four Android lint rules ship with the library:
 
 Before writing any code that references vmscope types, **verify the following against the actual vmscope dependency**:
 
-1. The group ID in build files (e.g., `org.velkos`, `io.github.velkosx`). Grep the project's build files for `vmscope-core`.
-2. The package root for import statements. Open one vmscope-core class in the consumer's dependency cache or module metadata and check the package declaration.
+1. The group ID in build files (e.g., `org.velkos`, `io.github.velkosx`). Grep the project's build files for `vmscope`.
+2. The package root for import statements. Open one vmscope class in the consumer's dependency cache or module metadata and check the package declaration.
 3. The names of the library's public symbols — they should be `vmScope`, `VmScopeConfig`, `VmScopeConfig.Provider`, `VmScopeConfig.Builder`, `vmScopeConfig`, `UnhandledViewModelException`, `VmScope.install`. If any symbol has been renamed in the shipped version, use the shipped name and note the divergence in your final report.
 
 Throughout this document, `org.velkos` and `org.velkos` are placeholders. Resolve them from the actual dependency before writing imports. In most code samples here, imports are written as `org.velkos.vmscope.xxx` — substitute the real package.
@@ -97,7 +97,7 @@ Report the detected shape before proceeding. Example report:
 
 For every Android app/library module detected:
 
-1. Confirm vmscope is a dependency. Grep for `vmscope-core` in all build files. If absent from any Android consumer module, stop and report — the user hasn't completed the install step.
+1. Confirm vmscope is a dependency. Grep for `vmscope` in all build files. If absent from any Android consumer module, stop and report — the user hasn't completed the install step.
 2. Confirm `lint-baseline.xml` exists in every Android module that ships application code. If absent, stop and report — the user hasn't run `./gradlew updateLintBaseline`. (Android library modules that only export a ViewModel API may not need a baseline; use judgment.)
 3. Run `./gradlew build` on the whole project. It must succeed. If it fails, stop and report — do not attempt migration on a broken baseline.
 

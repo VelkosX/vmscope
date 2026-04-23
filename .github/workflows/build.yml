@@ -41,19 +41,19 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Assemble Android + JVM + lint
-        run: ./gradlew :vmscope-core:assemble :vmscope-lint:assemble :sample-android:assembleDebug --stacktrace
+        run: ./gradlew :vmscope:assemble :vmscope-lint:assemble :sample-android:assembleDebug --stacktrace
 
       - name: Android unit tests
-        run: ./gradlew :vmscope-core:testDebugUnitTest --stacktrace
+        run: ./gradlew :vmscope:testDebugUnitTest --stacktrace
 
       - name: JVM tests
-        run: ./gradlew :vmscope-core:jvmTest --stacktrace
+        run: ./gradlew :vmscope:jvmTest --stacktrace
 
       - name: Lint tests
         run: ./gradlew :vmscope-lint:test --stacktrace
 
       - name: Android lint
-        run: ./gradlew :vmscope-core:lintDebug :sample-android:lintDebug --stacktrace
+        run: ./gradlew :vmscope:lintDebug :sample-android:lintDebug --stacktrace
 
       - name: Public API compatibility check
         run: ./gradlew apiCheck --stacktrace
@@ -85,13 +85,13 @@ jobs:
       - name: Compile iOS klibs (arm64 + x64 sim + simulator-arm64)
         run: |
           ./gradlew \
-            :vmscope-core:compileKotlinIosArm64 \
-            :vmscope-core:compileKotlinIosX64 \
-            :vmscope-core:compileKotlinIosSimulatorArm64 \
+            :vmscope:compileKotlinIosArm64 \
+            :vmscope:compileKotlinIosX64 \
+            :vmscope:compileKotlinIosSimulatorArm64 \
             --stacktrace
 
       - name: iOS simulator tests (iosSimulatorArm64)
-        run: ./gradlew :vmscope-core:iosSimulatorArm64Test --stacktrace
+        run: ./gradlew :vmscope:iosSimulatorArm64Test --stacktrace
 
       # The :sample-kmp:* modules are macOS-gated in settings.gradle.kts (shared/ has iOS
       # targets → needs Xcode tooling). Exercise them here to catch structural regressions in
@@ -112,5 +112,5 @@ jobs:
         with:
           name: reports-ios
           path: |
-            vmscope-core/build/reports/tests/
+            vmscope/build/reports/tests/
             sample-kmp/android-app/build/reports/lint-results-*.html

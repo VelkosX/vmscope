@@ -33,10 +33,10 @@ kotlin {
             baseName = "SampleShared"
             isStatic = true
             xcf.add(this)
-            // Re-export vmscope-core so Swift can reference VmScope, VmScopeConfig, and
+            // Re-export vmscope so Swift can reference VmScope, VmScopeConfig, and
             // UnhandledViewModelException directly by name. Without `export`, these would be
             // visible to the Kotlin sample glue but not to the Swift consumer.
-            export(project(":vmscope-core"))
+            export(project(":vmscope"))
             // Re-export the KMP ViewModel so SharedSampleViewModel's superclass is visible
             // to Swift.
             export(libs.jetbrains.lifecycle.viewmodel)
@@ -45,7 +45,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(project(":vmscope-core"))
+            api(project(":vmscope"))
             api(libs.jetbrains.lifecycle.viewmodel)
             implementation(libs.kotlinx.coroutines.core)
         }

@@ -34,10 +34,10 @@ Four rules ship inside the Android AAR via `lintPublish` — no consumer wiring 
 
 Published per-target artifacts:
 
-- `org.velkos:vmscope-core` — root metadata (Gradle picks the right target automatically)
-- `org.velkos:vmscope-core-android` — AAR with embedded lint rules
-- `org.velkos:vmscope-core-jvm` — JAR for desktop / server JVM
-- `org.velkos:vmscope-core-iosarm64`, `-iosx64`, `-iossimulatorarm64` — klibs
+- `org.velkos:vmscope` — root metadata (Gradle picks the right target automatically)
+- `org.velkos:vmscope-android` — AAR with embedded lint rules
+- `org.velkos:vmscope-jvm` — JAR for desktop / server JVM
+- `org.velkos:vmscope-iosarm64`, `-iosx64`, `-iossimulatorarm64` — klibs
 - `org.velkos:vmscope-lint` — standalone lint JAR (normally consumed transitively via the Android AAR)
 
 ### Samples

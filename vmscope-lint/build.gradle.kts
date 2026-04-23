@@ -30,7 +30,7 @@ dependencies {
 // AGP's `lintPublish` configuration requires a single JAR with no transitive dependencies.
 // The default Kotlin JVM plugin publishes the jar plus kotlin-stdlib, which AGP rejects.
 // We expose a dedicated `lintArtifact` configuration that carries only this module's jar;
-// consumers (vmscope-core) reference it explicitly.
+// consumers (vmscope) reference it explicitly.
 val lintArtifact by configurations.creating {
     isCanBeConsumed = true
     isCanBeResolved = false

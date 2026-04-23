@@ -45,7 +45,7 @@ android {
     }
 
     lint {
-        // Check transitive dependencies so vmscope-core's lint rules (shipped in its AAR via
+        // Check transitive dependencies so vmscope's lint rules (shipped in its AAR via
         // lintPublish) fire on this consumer. In particular the `UseVmScope` rule fires on the
         // shared ViewModel's deliberate `viewModelScope.launch { ... }` sites — demonstrating
         // that lint rules cross the shared-code boundary correctly on the Android consumer.
@@ -56,7 +56,7 @@ android {
 
 dependencies {
     implementation(project(":sample-kmp:shared"))
-    implementation(project(":vmscope-core"))
+    implementation(project(":vmscope"))
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.appcompat)

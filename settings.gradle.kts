@@ -26,7 +26,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "vmscope"
 
-include(":vmscope-core")
+include(":vmscope")
 include(":vmscope-lint")
 include(":sample-android")
 

@@ -6,7 +6,7 @@ First public release of vmscope. A Kotlin Multiplatform drop-in replacement for 
 
 ```kotlin
 dependencies {
-    implementation("org.velkos:vmscope-core:0.1.0")
+    implementation("org.velkos:vmscope:0.1.0")
 }
 ```
 

@@ -7,8 +7,8 @@ Thanks for taking an interest. This doc covers the things that aren't obvious fr
 Clone, then:
 
 ```bash
-./gradlew :vmscope-core:testDebugUnitTest      # Android unit tests
-./gradlew :vmscope-core:jvmTest                # JVM tests
+./gradlew :vmscope:testDebugUnitTest      # Android unit tests
+./gradlew :vmscope:jvmTest                # JVM tests
 ./gradlew :vmscope-lint:test                   # lint rule tests
 ./gradlew apiCheck                             # public API surface check
 ```
@@ -18,19 +18,19 @@ Clone, then:
 iOS targets require macOS + Xcode:
 
 ```bash
-./gradlew :vmscope-core:iosSimulatorArm64Test  # iOS sim test runner
-./gradlew :vmscope-core:compileKotlinIosArm64  # iOS device klib (no test runner — sim only)
+./gradlew :vmscope:iosSimulatorArm64Test  # iOS sim test runner
+./gradlew :vmscope:compileKotlinIosArm64  # iOS device klib (no test runner — sim only)
 ```
 
 ## Public API changes
 
-The library uses Kotlin's `explicitApi()` (every top-level + member declaration must be marked `public` or `internal`) plus [binary-compatibility-validator](https://github.com/Kotlin/binary-compatibility-validator) with klib enabled. The validator generates one `.api` file per target under `vmscope-core/api/` — checked into the repo.
+The library uses Kotlin's `explicitApi()` (every top-level + member declaration must be marked `public` or `internal`) plus [binary-compatibility-validator](https://github.com/Kotlin/binary-compatibility-validator) with klib enabled. The validator generates one `.api` file per target under `vmscope/api/` — checked into the repo.
 
 If your change adds, removes, or modifies anything in the public API surface, **CI will fail at `apiCheck`** until you regenerate and commit the dump:
 
 ```bash
 ./gradlew apiDump
-git add vmscope-core/api/
+git add vmscope/api/
 ```
 
 Reviewers will look at the `.api` diff to evaluate the API surface change explicitly. This is the intended workflow — it forces public-API decisions to be visible in the PR rather than slipping in.
