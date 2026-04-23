@@ -1,0 +1,36 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <vmscope:vmscope-core>
+final class org.velkos.vmscope/UnhandledViewModelException : kotlin/RuntimeException { // org.velkos.vmscope/UnhandledViewModelException|null[0]
+    constructor <init>(kotlin/Throwable) // org.velkos.vmscope/UnhandledViewModelException.<init>|<init>(kotlin.Throwable){}[0]
+}
+
+final class org.velkos.vmscope/VmScopeConfig { // org.velkos.vmscope/VmScopeConfig|null[0]
+    abstract interface Provider { // org.velkos.vmscope/VmScopeConfig.Provider|null[0]
+        abstract val vmScopeConfiguration // org.velkos.vmscope/VmScopeConfig.Provider.vmScopeConfiguration|{}vmScopeConfiguration[0]
+            abstract fun <get-vmScopeConfiguration>(): org.velkos.vmscope/VmScopeConfig // org.velkos.vmscope/VmScopeConfig.Provider.vmScopeConfiguration.<get-vmScopeConfiguration>|<get-vmScopeConfiguration>(){}[0]
+    }
+
+    final class Builder { // org.velkos.vmscope/VmScopeConfig.Builder|null[0]
+        constructor <init>() // org.velkos.vmscope/VmScopeConfig.Builder.<init>|<init>(){}[0]
+
+        final fun build(): org.velkos.vmscope/VmScopeConfig // org.velkos.vmscope/VmScopeConfig.Builder.build|build(){}[0]
+        final fun handler(kotlinx.coroutines/CoroutineExceptionHandler): org.velkos.vmscope/VmScopeConfig.Builder // org.velkos.vmscope/VmScopeConfig.Builder.handler|handler(kotlinx.coroutines.CoroutineExceptionHandler){}[0]
+        final fun onUnhandledException(kotlin/Function1<org.velkos.vmscope/UnhandledViewModelException, kotlin/Unit>): org.velkos.vmscope/VmScopeConfig.Builder // org.velkos.vmscope/VmScopeConfig.Builder.onUnhandledException|onUnhandledException(kotlin.Function1<org.velkos.vmscope.UnhandledViewModelException,kotlin.Unit>){}[0]
+    }
+}
+
+final object org.velkos.vmscope/VmScope { // org.velkos.vmscope/VmScope|null[0]
+    final fun install(kotlin/Function1<org.velkos.vmscope/VmScopeConfig.Builder, kotlin/Unit>) // org.velkos.vmscope/VmScope.install|install(kotlin.Function1<org.velkos.vmscope.VmScopeConfig.Builder,kotlin.Unit>){}[0]
+    final fun install(org.velkos.vmscope/VmScopeConfig) // org.velkos.vmscope/VmScope.install|install(org.velkos.vmscope.VmScopeConfig){}[0]
+}
+
+final val org.velkos.vmscope/vmScope // org.velkos.vmscope/vmScope|@androidx.lifecycle.ViewModel{}vmScope[0]
+    final fun (androidx.lifecycle/ViewModel).<get-vmScope>(): kotlinx.coroutines/CoroutineScope // org.velkos.vmscope/vmScope.<get-vmScope>|<get-vmScope>@androidx.lifecycle.ViewModel(){}[0]
+
+final fun org.velkos.vmscope/vmScopeConfig(kotlin/Function1<org.velkos.vmscope/VmScopeConfig.Builder, kotlin/Unit>): org.velkos.vmscope/VmScopeConfig // org.velkos.vmscope/vmScopeConfig|vmScopeConfig(kotlin.Function1<org.velkos.vmscope.VmScopeConfig.Builder,kotlin.Unit>){}[0]

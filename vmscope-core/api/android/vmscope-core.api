@@ -1,0 +1,39 @@
+public final class org/velkos/vmscope/CoroutineScopeKt {
+	public static final fun getVmScope (Landroidx/lifecycle/ViewModel;)Lkotlinx/coroutines/CoroutineScope;
+}
+
+public final class org/velkos/vmscope/UnhandledViewModelException : java/lang/RuntimeException {
+	public fun <init> (Ljava/lang/Throwable;)V
+}
+
+public final class org/velkos/vmscope/VmScope {
+	public static final field INSTANCE Lorg/velkos/vmscope/VmScope;
+	public final fun install (Lkotlin/jvm/functions/Function1;)V
+	public final fun install (Lorg/velkos/vmscope/VmScopeConfig;)V
+}
+
+public final class org/velkos/vmscope/VmScopeConfig {
+}
+
+public final class org/velkos/vmscope/VmScopeConfig$Builder {
+	public fun <init> ()V
+	public final fun build ()Lorg/velkos/vmscope/VmScopeConfig;
+	public final fun handler (Lkotlinx/coroutines/CoroutineExceptionHandler;)Lorg/velkos/vmscope/VmScopeConfig$Builder;
+	public final fun onUnhandledException (Lkotlin/jvm/functions/Function1;)Lorg/velkos/vmscope/VmScopeConfig$Builder;
+}
+
+public abstract interface class org/velkos/vmscope/VmScopeConfig$Provider {
+	public abstract fun getVmScopeConfiguration ()Lorg/velkos/vmscope/VmScopeConfig;
+}
+
+public final class org/velkos/vmscope/VmScopeConfigKt {
+	public static final fun vmScopeConfig (Lkotlin/jvm/functions/Function1;)Lorg/velkos/vmscope/VmScopeConfig;
+}
+
+public final class org/velkos/vmscope/VmScopeInitializer : androidx/startup/Initializer {
+	public fun <init> ()V
+	public synthetic fun create (Landroid/content/Context;)Ljava/lang/Object;
+	public fun create (Landroid/content/Context;)V
+	public fun dependencies ()Ljava/util/List;
+}
+

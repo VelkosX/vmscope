@@ -1,0 +1,108 @@
+name: Build
+
+on:
+  push:
+    branches: [main, kmp]
+  pull_request:
+    branches: [main]
+
+jobs:
+  gradle-wrapper:
+    name: Gradle wrapper validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Verifies the SHA of gradle/wrapper/gradle-wrapper.jar against Gradle's published
+      # hashes — catches supply-chain attacks where someone swaps the wrapper jar for a
+      # malicious one. Cheap; runs in seconds.
+      - uses: gradle/actions/wrapper-validation@v4
+
+  jvm-android:
+    name: JVM + Android + lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Assemble Android + JVM + lint
+        run: ./gradlew :vmscope-core:assemble :vmscope-lint:assemble :sample-android:assembleDebug --stacktrace
+
+      - name: Android unit tests
+        run: ./gradlew :vmscope-core:testDebugUnitTest --stacktrace
+
+      - name: JVM tests
+        run: ./gradlew :vmscope-core:jvmTest --stacktrace
+
+      - name: Lint tests
+        run: ./gradlew :vmscope-lint:test --stacktrace
+
+      - name: Android lint
+        run: ./gradlew :vmscope-core:lintDebug :sample-android:lintDebug --stacktrace
+
+      - name: Public API compatibility check
+        run: ./gradlew apiCheck --stacktrace
+
+      - name: Upload reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-jvm-android
+          path: |
+            **/build/reports/tests/
+            **/build/reports/lint-results-*.html
+
+  ios:
+    name: iOS (sim + klibs)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Compile iOS klibs (arm64 + x64 sim + simulator-arm64)
+        run: |
+          ./gradlew \
+            :vmscope-core:compileKotlinIosArm64 \
+            :vmscope-core:compileKotlinIosX64 \
+            :vmscope-core:compileKotlinIosSimulatorArm64 \
+            --stacktrace
+
+      - name: iOS simulator tests (iosSimulatorArm64)
+        run: ./gradlew :vmscope-core:iosSimulatorArm64Test --stacktrace
+
+      # The :sample-kmp:* modules are macOS-gated in settings.gradle.kts (shared/ has iOS
+      # targets → needs Xcode tooling). Exercise them here to catch structural regressions in
+      # the shared ViewModel, commonMain/iosMain wiring, and the XCFramework assembly
+      # pipeline. `assembleSampleSharedDebugXCFramework` is the same task `sample-kmp/ios-app`
+      # depends on at link time — if this green, the Xcode project will find the framework.
+      - name: Build KMP sample (XCFramework + Android consumer)
+        run: |
+          ./gradlew \
+            :sample-kmp:shared:assembleSampleSharedDebugXCFramework \
+            :sample-kmp:android-app:assembleDebug \
+            :sample-kmp:android-app:lint \
+            --stacktrace
+
+      - name: Upload iOS reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-ios
+          path: |
+            vmscope-core/build/reports/tests/
+            sample-kmp/android-app/build/reports/lint-results-*.html

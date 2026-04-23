@@ -1,0 +1,21 @@
+.gradle/
+build/
+*/build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+.kotlin/
+.claude/
+kotlin-js-store/
+node_modules/
+*.hprof
+
+# Xcode per-user state — auto-regenerated when opening .xcodeproj / .xcworkspace.
+xcuserdata/
+# Xcode build cache (lives outside the project tree by default; listed defensively).
+DerivedData/
+*.xcuserstate

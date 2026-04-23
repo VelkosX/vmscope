@@ -1,0 +1,68 @@
+name: Bug report
+description: Report something vmscope does wrong.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue. A tight reproduction gets this fixed faster than a long description — a small sample project, failing test, or clear code snippet is ideal.
+
+  - type: input
+    id: version
+    attributes:
+      label: vmscope version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target
+      options:
+        - Android
+        - iOS (arm64)
+        - iOS (simulator-arm64 / x64 sim)
+        - JVM desktop / server
+        - Multiple (describe in body)
+    validations:
+      required: true
+
+  - type: input
+    id: platform-versions
+    attributes:
+      label: Platform toolchain versions
+      description: Kotlin, AGP / Xcode / JDK, Gradle — whatever's relevant.
+      placeholder: "Kotlin 2.3.20, AGP 9.2.0, Gradle 9.0.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Smallest example that shows the bug. A failing test case is perfect; a snippet + expected vs. actual is also fine.
+      render: kotlin
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include stack traces, logs, or crash output verbatim — don't paraphrase.
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional notes
+      description: Anything else — workarounds you've tried, hypotheses, links to related issues.

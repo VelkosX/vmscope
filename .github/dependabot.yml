@@ -1,0 +1,35 @@
+version: 2
+
+updates:
+  # Gradle dependencies — scans libs.versions.toml + build.gradle.kts files across all
+  # modules. Weekly cadence keeps the noise low; dependency PRs batch where possible.
+  - package-ecosystem: gradle
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - gradle
+    groups:
+      kotlin-and-coroutines:
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "org.jetbrains.kotlinx:kotlinx-coroutines*"
+      androidx:
+        patterns:
+          - "androidx.*"
+          - "org.jetbrains.androidx.*"
+      android-tools:
+        patterns:
+          - "com.android.tools*"
+          - "com.android.*"
+
+  # GitHub Actions workflows — catches outdated action versions (actions/checkout@vN etc).
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    labels:
+      - dependencies
+      - ci

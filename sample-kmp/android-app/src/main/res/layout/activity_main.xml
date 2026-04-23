@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="vmScope KMP sample"
+        android:textSize="20sp"
+        android:layout_marginBottom="24dp" />
+
+    <Button
+        android:id="@+id/button_successful"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Successful launch" />
+
+    <Button
+        android:id="@+id/button_throwing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Throwing launch (vmScope)" />
+
+    <Button
+        android:id="@+id/button_view_model_scope"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Deliberate viewModelScope (lint demo)" />
+
+    <Button
+        android:id="@+id/button_view_model_scope_throwing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Throw on raw viewModelScope" />
+
+</LinearLayout>

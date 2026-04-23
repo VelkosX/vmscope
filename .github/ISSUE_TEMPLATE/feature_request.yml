@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest a change or new capability.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature requests are most useful when grounded in a concrete scenario — what problem does this solve in your real project? The "why" shapes the design more than the "what".
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do that vmscope doesn't support, makes awkward, or gets wrong?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: What should the API or behavior look like? Sketches, code examples, and prior art from other libraries are all welcome.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What workarounds have you tried, or why do existing features not cover this?
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Target scope
+      options:
+        - Android
+        - iOS
+        - JVM
+        - All targets
+        - Not sure
+    validations:
+      required: true
