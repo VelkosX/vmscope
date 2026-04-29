@@ -23,7 +23,7 @@ jobs:
       # Verifies the SHA of gradle/wrapper/gradle-wrapper.jar against Gradle's published
       # hashes — catches supply-chain attacks where someone swaps the wrapper jar for a
       # malicious one. Cheap; runs in seconds.
-      - uses: gradle/actions/wrapper-validation@v4
+      - uses: gradle/actions/wrapper-validation@v6
 
   jvm-android:
     name: JVM + Android + lint
@@ -38,7 +38,7 @@ jobs:
           java-version: '17'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Assemble Android + JVM + lint
         run: ./gradlew :vmscope:assemble :vmscope-lint:assemble :sample-android:assembleDebug --stacktrace
@@ -80,7 +80,7 @@ jobs:
           java-version: '17'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Compile iOS klibs (arm64 + x64 sim + simulator-arm64)
         run: |
