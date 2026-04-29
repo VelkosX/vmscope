@@ -19,7 +19,7 @@ jobs:
     name: Gradle wrapper validation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       # Verifies the SHA of gradle/wrapper/gradle-wrapper.jar against Gradle's published
       # hashes — catches supply-chain attacks where someone swaps the wrapper jar for a
       # malicious one. Cheap; runs in seconds.
@@ -29,7 +29,7 @@ jobs:
     name: JVM + Android + lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -71,7 +71,7 @@ jobs:
     name: iOS (sim + klibs)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
